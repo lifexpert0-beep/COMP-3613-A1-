@@ -18,3 +18,4 @@ class ServiceEntry(db.Model):
         
     def __repr__(self):
         return f'<Service Ticket {self.serviceid} - Student ID: {self.student_id} - Hours Requested: {self.hours}>'
+    

@@ -44,7 +44,7 @@ def list_student_command(format):
 @student_cli.command("request", help="Request hours from staff")
 @click.argument("studentid", type=int)
 @click.argument("hours", type=int)
-def request_log_hours_command(studentid,hours):
+def requestHours(studentid,hours):
     create_request(studentid,hours)
     print(f'Your request for {hours} hours of service for student {studentid} has been forwarded to staff.')
 
