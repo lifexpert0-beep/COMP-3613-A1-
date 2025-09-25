@@ -2,9 +2,10 @@ import click, pytest, sys
 from flask.cli import with_appcontext, AppGroup
 
 from App.database import db, get_migrate
-from App.models import User
+from App.models import (Student,Staff,ServiceEntry)
 from App.main import create_app
-from App.controllers import ( create_user, get_all_users_json, get_all_users, initialize )
+from App.controllers import ( initialize )
+from App.controllers import ( create_student,get_all_students, create_staff,create_request,view_all_requests,log_hours)
 
 
 # This commands file allow you to create convenient CLI commands for testing controllers
@@ -15,54 +16,73 @@ migrate = get_migrate(app)
 # This command creates and initializes the database
 @app.cli.command("init", help="Creates and initializes the database")
 def init():
+    
     initialize()
     print('database intialized')
 
 '''
-User Commands
+Student Commands
 '''
+#Student Account Creation
 
-# Commands can be organized using groups
-
-# create a group, it would be the first argument of the comand
-# eg : flask user <command>
-user_cli = AppGroup('user', help='User object commands') 
-
-# Then define the command and any parameters and annotate it with the group (@)
-@user_cli.command("create", help="Creates a user")
+student_cli = AppGroup('student', help='Student object commands') 
+@student_cli.command("create", help="Creates a user")
 @click.argument("username", default="rob")
-@click.argument("password", default="robpass")
-def create_user_command(username, password):
-    create_user(username, password)
-    print(f'{username} created!')
+def create_user_command(username):
+    new_student=create_student(username)
+    studentid=new_student.studentid
+    print(f'{username} created!, Your ID is {studentid}')
 
-# this command will be : flask user create bob bobpass
-
-@user_cli.command("list", help="Lists users in the database")
+#View All Students (my personal use)
+@student_cli.command("list", help="Lists users in the database")
 @click.argument("format", default="string")
-def list_user_command(format):
-    if format == 'string':
-        print(get_all_users())
-    else:
-        print(get_all_users_json())
+def list_student_command(format):
+        print(get_all_students())
+#Student View Accolades
+#Student View LeaderBoards
+#Student Request Hours
+@student_cli.command("request", help="Request hours from staff")
+@click.argument("studentid", type=int)
+@click.argument("hours", type=int)
+def request_log_hours_command(studentid,hours):
+    create_request(studentid,hours)
+    print(f'Your request for {hours} hours of service for student {studentid} has been forwarded to staff.')
 
-app.cli.add_command(user_cli) # add the group to the cli
+app.cli.add_command(student_cli)
 
 '''
-Test Commands
+Staff Commands
 '''
 
-test = AppGroup('test', help='Testing commands') 
+#Staff Create Account
 
-@test.command("user", help="Run User tests")
-@click.argument("type", default="all")
-def user_tests_command(type):
-    if type == "unit":
-        sys.exit(pytest.main(["-k", "UserUnitTests"]))
-    elif type == "int":
-        sys.exit(pytest.main(["-k", "UserIntegrationTests"]))
+staff_cli = AppGroup('staff', help='Staff object commands')
+@staff_cli.command("create", help="Creates a user")
+@click.argument("username", default="rob")
+def create_staff_command(username):
+    new_staff=create_staff(username)
+    staffid=new_staff.staffid
+    print(f'{username} created!, Your ID is {staffid}')
+
+#Staff Log Hours
+
+@staff_cli.command("log", help="Log community service hours for students")
+@click.argument("staffid",type=int)
+@click.argument("serviceid",type=int)
+@click.argument("status",type=int) # 0/1 = Approved/Rejected
+def log_hours_command(staffid,serviceid,status):
+    log_hours(staffid,serviceid,status)
+    if(status==0):
+         print(f'You have approved service ticket {serviceid}.')
+    elif (status==1): 
+         print(f'You have rejected service ticket {serviceid}.')
     else:
-        sys.exit(pytest.main(["-k", "App"]))
-    
+         print(f'You have entered an invalid option. Syntax = StaffID ServiceID,Status [0/1 = Approved/Rejected]')
+#Staff View Pending confirms
 
-app.cli.add_command(test)
+@staff_cli.command("view", help="View Requests for community service hours")
+@click.argument("format", default="string")
+def list_student_command(format):
+        print(view_all_requests())
+        
+app.cli.add_command(staff_cli)
