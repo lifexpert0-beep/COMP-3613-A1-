@@ -12,5 +12,5 @@ Request Service Hours : flask student request [studentid] [hours] <br>
 # Staff Commands
 
 Create Staff Object : flask staff create [username] <br>
-Staff Logging : flask staff log [staffid] [serviceid] [status]  Status [0/1 = Approved/Rejected] <br>
+Staff Logging : flask staff log [staffid] [serviceid] [status]                 ** Status [0/1 = Approved/Rejected] <br>
 Staff View Pending Requests : flask staff view <br>
