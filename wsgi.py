@@ -48,7 +48,7 @@ Student Commands
 student_cli = AppGroup('student', help='Student object commands') 
 @student_cli.command("create", help="Creates a user")
 @click.argument("username", default="rob")
-def create_user_command(username):
+def createStudent(username):
     new_student=create_student(username)
     studentid=new_student.studentid
     print(f'{username} created!, Your ID is {studentid}')
@@ -69,7 +69,7 @@ def viewAccolades():
 #Student View LeaderBoards
 
 @student_cli.command("leaderboard", help="Shows the top 5 students with the most hours in descending order.")
-def view_leaderboard():
+def viewLeaderboard():
      print(get_leaderboard())
 
 #Student Request Hours
@@ -92,7 +92,7 @@ Staff Commands
 staff_cli = AppGroup('staff', help='Staff object commands')
 @staff_cli.command("create", help="Creates a user")
 @click.argument("username", default="rob")
-def create_staff_command(username):
+def createStaff(username):
     new_staff=create_staff(username)
     staffid=new_staff.staffid
     print(f'{username} created!, Your ID is {staffid}')
@@ -103,7 +103,7 @@ def create_staff_command(username):
 @click.argument("staffid",type=int)
 @click.argument("serviceid",type=int)
 @click.argument("status",type=int) # 0/1 = Approved/Rejected
-def log_hours_command(staffid,serviceid,status):
+def logHours(staffid,serviceid,status):
     log_hours(staffid,serviceid,status)
     if(status==0):
          print(f'You have approved service ticket {serviceid}.')
@@ -116,7 +116,7 @@ def log_hours_command(staffid,serviceid,status):
 
 @staff_cli.command("view", help="View Requests for community service hours")
 @click.argument("format", default="string")
-def list_student_command(format):
+def viewRequests(format):
         print(view_all_requests())
         
 app.cli.add_command(staff_cli)
