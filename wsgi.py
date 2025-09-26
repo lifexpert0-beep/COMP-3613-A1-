@@ -2,10 +2,10 @@ import click, pytest, sys
 from flask.cli import with_appcontext, AppGroup
 
 from App.database import db, get_migrate
-from App.models import (Student,Staff,ServiceEntry)
+from App.models import (Student,Staff,ServiceEntry,Accolade)
 from App.main import create_app
 from App.controllers import ( initialize )
-from App.controllers import ( create_student,get_all_students, create_staff,create_request,view_all_requests,log_hours, get_leaderboard)
+from App.controllers import ( create_student,get_all_students, create_staff,create_request,view_all_requests,log_hours, get_leaderboard,get_all_accolades)
 
 
 # This commands file allow you to create convenient CLI commands for testing controllers
@@ -13,11 +13,31 @@ from App.controllers import ( create_student,get_all_students, create_staff,crea
 app = create_app()
 migrate = get_migrate(app)
 
-# This command creates and initializes the database
+# This command creates and initializes the database along with dummy information for easier
 @app.cli.command("init", help="Creates and initializes the database")
 def init():
     
     initialize()
+    accoladeTen = Accolade(
+         title="Digital Debutant",
+         description="Unlocks a digital badge and printable certificate.",
+         hoursrequired=10
+    )
+    accoladeTwentyFive = Accolade(
+         title="Community Contributor",
+         description="Grants access to a mentor-reviewed project opportunity.",
+         hoursrequired=25
+    )
+    accoladeFifty= Accolade(
+         title="Domain Master",
+         description="Provides a letter of recommendation template.",
+         hoursrequired=50
+    )
+    db.session.add(accoladeTen)
+    db.session.add(accoladeTwentyFive)
+    db.session.add(accoladeFifty)
+    db.session.commit()
+
     print('database intialized')
 
 '''
@@ -34,17 +54,26 @@ def create_user_command(username):
     print(f'{username} created!, Your ID is {studentid}')
 
 #View All Students (my personal use)
+
 @student_cli.command("list", help="Lists users in the database")
 @click.argument("format", default="string")
 def list_student_command(format):
         print(get_all_students())
+
 #Student View Accolades
+
+@student_cli.command("accolade", help="Displays accolades")
+def viewAccolades():
+     print(get_all_accolades())
+
 #Student View LeaderBoards
+
 @student_cli.command("leaderboard", help="Shows the top 5 students with the most hours in descending order.")
 def view_leaderboard():
      print(get_leaderboard())
 
 #Student Request Hours
+
 @student_cli.command("request", help="Request hours from staff")
 @click.argument("studentid", type=int)
 @click.argument("hours", type=int)
@@ -82,6 +111,7 @@ def log_hours_command(staffid,serviceid,status):
          print(f'You have rejected service ticket {serviceid}.')
     else:
          print(f'You have entered an invalid option. Syntax = StaffID ServiceID,Status [0/1 = Approved/Rejected]')
+
 #Staff View Pending confirms
 
 @staff_cli.command("view", help="View Requests for community service hours")
