@@ -5,7 +5,7 @@ from App.database import db, get_migrate
 from App.models import (Student,Staff,ServiceEntry)
 from App.main import create_app
 from App.controllers import ( initialize )
-from App.controllers import ( create_student,get_all_students, create_staff,create_request,view_all_requests,log_hours)
+from App.controllers import ( create_student,get_all_students, create_staff,create_request,view_all_requests,log_hours, get_leaderboard)
 
 
 # This commands file allow you to create convenient CLI commands for testing controllers
@@ -40,6 +40,10 @@ def list_student_command(format):
         print(get_all_students())
 #Student View Accolades
 #Student View LeaderBoards
+@student_cli.command("leaderboard", help="Shows the top 5 students with the most hours in descending order.")
+def view_leaderboard():
+     print(get_leaderboard())
+
 #Student Request Hours
 @student_cli.command("request", help="Request hours from staff")
 @click.argument("studentid", type=int)
